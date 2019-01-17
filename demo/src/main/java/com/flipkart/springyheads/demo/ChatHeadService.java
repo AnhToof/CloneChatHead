@@ -1,29 +1,35 @@
 package com.flipkart.springyheads.demo;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.flipkart.chatheads.ui.ChatHead;
+import com.flipkart.chatheads.ui.ChatHeadArrangement;
+import com.flipkart.chatheads.ui.ChatHeadConfig;
+import com.flipkart.chatheads.ui.ChatHeadListener;
 import com.flipkart.chatheads.ui.ChatHeadViewAdapter;
 import com.flipkart.chatheads.ui.MaximizedArrangement;
 import com.flipkart.chatheads.ui.MinimizedArrangement;
-import com.flipkart.chatheads.ui.DefaultChatHeadManager;
+import com.flipkart.chatheads.ui.container.DefaultChatHeadManager;
 import com.flipkart.chatheads.ui.container.WindowManagerContainer;
 import com.flipkart.circularImageView.CircularDrawable;
 import com.flipkart.circularImageView.TextDrawer;
 import com.flipkart.circularImageView.notification.CircularNotificationDrawer;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,11 +38,18 @@ import java.util.Random;
 public class ChatHeadService extends Service {
 
     // Binder given to clients
+    private static final String TAG = ChatHeadService.class.getSimpleName();
+
     private final IBinder mBinder = new LocalBinder();
     private DefaultChatHeadManager<String> chatHeadManager;
     private int chatHeadIdentifier = 0;
     private WindowManagerContainer windowManagerContainer;
     private Map<String, View> viewCache = new HashMap<>();
+
+
+    public static Intent showFloating(Context context) {
+        return new Intent(context, ChatHeadService.class);
+    }
 
 
     @Override
@@ -45,11 +58,22 @@ public class ChatHeadService extends Service {
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        moveToForeground();
+        return START_NOT_STICKY;
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
 
         windowManagerContainer = new WindowManagerContainer(this);
-        chatHeadManager = new DefaultChatHeadManager<String>(this, windowManagerContainer);
+        chatHeadManager = new DefaultChatHeadManager<String>(this, windowManagerContainer) {
+            @Override
+            public void setConfig(ChatHeadConfig config) {
+                super.setConfig(new CustomChatHeadConfig(ChatHeadService.this, 56, 56));
+            }
+        };
         chatHeadManager.setViewAdapter(new ChatHeadViewAdapter<String>() {
 
             @Override
@@ -90,9 +114,37 @@ public class ChatHeadService extends Service {
             }
         });
 
-        addChatHead();
-        addChatHead();
-        addChatHead();
+        chatHeadManager.setListener(new ChatHeadListener() {
+            @Override
+            public void onChatHeadAdded(Object key) {
+            }
+
+            @Override
+            public void onChatHeadRemoved(Object key, boolean userTriggered) {
+                if (chatHeadManager.getChatHeads().isEmpty()) {
+                    stopForeground(true);
+                    stopSelf();
+                    stopService(showFloating(getApplicationContext()));
+                }
+            }
+
+            @Override
+            public void onChatHeadArrangementChanged(ChatHeadArrangement oldArrangement,
+                    ChatHeadArrangement newArrangement) {
+
+            }
+
+            @Override
+            public void onChatHeadAnimateEnd(ChatHead chatHead) {
+
+            }
+
+            @Override
+            public void onChatHeadAnimateStart(ChatHead chatHead) {
+
+            }
+        });
+
         addChatHead();
         chatHeadManager.setArrangement(MinimizedArrangement.class, null);
         moveToForeground();
@@ -120,12 +172,13 @@ public class ChatHeadService extends Service {
                 .build();
 
         startForeground(1, notification);
+
     }
 
     public void addChatHead() {
         chatHeadIdentifier++;
-        chatHeadManager.addChatHead(String.valueOf(chatHeadIdentifier), false, true);
-        chatHeadManager.bringToFront(chatHeadManager.findChatHeadByKey(String.valueOf(chatHeadIdentifier)));
+        chatHeadManager.addChatHead(String.valueOf(1), false, true);
+        chatHeadManager.bringToFront(chatHeadManager.findChatHeadByKey(String.valueOf(1)));
     }
 
     public void removeChatHead() {
@@ -147,13 +200,14 @@ public class ChatHeadService extends Service {
     }
 
     public void updateBadgeCount() {
-        chatHeadManager.reloadDrawable(String.valueOf(chatHeadIdentifier));
+        chatHeadManager.reloadDrawable(String.valueOf(1));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         windowManagerContainer.destroy();
+        chatHeadManager = null;
     }
 
     public void minimize() {

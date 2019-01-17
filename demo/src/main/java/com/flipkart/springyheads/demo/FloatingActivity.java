@@ -52,7 +52,6 @@ public class FloatingActivity extends Activity implements View.OnClickListener {
         startService(intent);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         setupButtons();
-        finish();
     }
 
     private void setupButtons() {

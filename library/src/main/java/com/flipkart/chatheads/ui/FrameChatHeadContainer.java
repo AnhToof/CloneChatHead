@@ -1,4 +1,4 @@
-package com.flipkart.chatheads.ui.container;
+package com.flipkart.chatheads.ui;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
@@ -6,9 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import com.flipkart.chatheads.ui.ChatHeadContainer;
-import com.flipkart.chatheads.ui.ChatHeadManager;
-import com.flipkart.chatheads.ui.HostFrameLayout;
 
 /**
  * Created by kiran.kumar on 02/11/16.

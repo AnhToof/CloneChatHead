@@ -108,24 +108,25 @@ public class ChatHeadCloseButton extends android.support.v7.widget.AppCompatImag
     }
 
     public void disappear(boolean immediate, boolean animate) {
-        ySpring.setEndValue(mParentHeight - centerY + chatHeadManager.getConfig().getCloseButtonHeight());
-        ySpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
-        xSpring.setEndValue(0);
-        ySpring.addListener(new SimpleSpringListener() {
-            @Override
-            public void onSpringAtRest(Spring spring) {
-                super.onSpringAtRest(spring);
-                ySpring.removeListener(this);
+        if (immediate) {
+            ySpring.setEndValue(mParentHeight - centerY + chatHeadManager.getConfig().getCloseButtonHeight());
+            ySpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
+            xSpring.setEndValue(0);
+            ySpring.addListener(new SimpleSpringListener() {
+                @Override
+                public void onSpringAtRest(Spring spring) {
+                    super.onSpringAtRest(spring);
+                    ySpring.removeListener(this);
+                }
+            });
+            scaleSpring.setEndValue(0.1f);
+            if (!animate) {
+                ySpring.setCurrentValue(mParentHeight, true);
+                xSpring.setCurrentValue(0, true);
             }
-        });
-        scaleSpring.setEndValue(0.1f);
-        if (!animate) {
-            ySpring.setCurrentValue(mParentHeight, true);
-            xSpring.setCurrentValue(0, true);
+            disappeared = true;
+            if (listener != null) listener.onCloseButtonDisappear();
         }
-        disappeared = true;
-        if (listener != null) listener.onCloseButtonDisappear();
-
     }
 
     @Override

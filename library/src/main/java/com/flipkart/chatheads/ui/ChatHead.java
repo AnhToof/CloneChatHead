@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
@@ -278,10 +279,8 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
                         activeVerticalSpring.setCurrentValue(downTranslationY + offsetY);
                         manager.getCloseButton().onRelease();
                     }
-
                     velocityTracker.computeCurrentVelocity(1000);
                 }
-
             }
 
         } else {
@@ -296,6 +295,12 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
                 velocityTracker.recycle();
                 velocityTracker = null;
                 if(xPositionSpring!=null && yPositionSpring!=null) {
+                    ChatHeadArrangement chatHeadArrangement = manager.getActiveArrangement();
+                    if(chatHeadArrangement instanceof MaximizedArrangement){
+                        if(manager.getChatHeads().size()<2){
+                            manager.setArrangement(MinimizedArrangement.class, null);
+                        }
+                    }
                     boolean touchUpHandled = manager.getActiveArrangement().handleTouchUp(this, xVelocity, yVelocity, activeHorizontalSpring, activeVerticalSpring, wasDragging);
                 }
             }
@@ -327,7 +332,4 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
     public enum State {
         FREE, CAPTURED
     }
-
-
 }
-

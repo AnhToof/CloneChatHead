@@ -1,4 +1,4 @@
-package com.flipkart.chatheads.ui;
+package com.flipkart.chatheads.ui.container;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -11,6 +11,7 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,20 @@ import android.widget.ImageView;
 import com.facebook.rebound.SpringConfigRegistry;
 import com.facebook.rebound.SpringSystem;
 import com.flipkart.chatheads.R;
+import com.flipkart.chatheads.ui.ChatHead;
+import com.flipkart.chatheads.ui.ChatHeadArrangement;
+import com.flipkart.chatheads.ui.ChatHeadCloseButton;
+import com.flipkart.chatheads.ui.ChatHeadConfig;
+import com.flipkart.chatheads.ui.ChatHeadContainer;
+import com.flipkart.chatheads.ui.ChatHeadDefaultConfig;
+import com.flipkart.chatheads.ui.ChatHeadListener;
+import com.flipkart.chatheads.ui.ChatHeadManager;
+import com.flipkart.chatheads.ui.ChatHeadOverlayView;
+import com.flipkart.chatheads.ui.ChatHeadViewAdapter;
+import com.flipkart.chatheads.ui.MaximizedArrangement;
+import com.flipkart.chatheads.ui.MinimizedArrangement;
+import com.flipkart.chatheads.ui.SpringConfigsHolder;
+import com.flipkart.chatheads.ui.UpArrowLayout;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +43,8 @@ import java.util.List;
 import java.util.Map;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class DefaultChatHeadManager<T extends Serializable> implements ChatHeadCloseButton.CloseButtonListener, ChatHeadManager<T> {
+public class DefaultChatHeadManager<T extends Serializable> implements
+        ChatHeadCloseButton.CloseButtonListener, ChatHeadManager<T> {
 
     private static final int OVERLAY_TRANSITION_DURATION = 200;
     private final Map<Class<? extends ChatHeadArrangement>, ChatHeadArrangement> arrangements = new HashMap<>(3);
@@ -179,14 +195,6 @@ public class DefaultChatHeadManager<T extends Serializable> implements ChatHeadC
 
     }
 
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent ev) {
-//        if (activeArrangement != null) {
-//            activeArrangement.handleRawTouchEvent(ev);
-//        }
-//        return super.dispatchTouchEvent(ev);
-//    }
-
     @Override
     public ChatHead<T> addChatHead(T key, boolean isSticky, boolean animated) {
         ChatHead<T> chatHead = findChatHeadByKey(key);
@@ -211,6 +219,8 @@ public class DefaultChatHeadManager<T extends Serializable> implements ChatHeadC
                 listener.onChatHeadAdded(key);
             }
             closeButtonShadow.bringToFront();
+        } else  {
+            chatHead.setUnreadCount(chatHead.getUnreadCount() + 1);
         }
         return chatHead;
     }
@@ -476,13 +486,15 @@ public class DefaultChatHeadManager<T extends Serializable> implements ChatHeadC
 
     @Override
     public void removeView(ChatHead<T> chatHead, ViewGroup parent) {
-        viewAdapter.removeView(chatHead.getKey(), chatHead, parent);
+        if(chatHeads.size()>0)
+            viewAdapter.removeView(chatHead.getKey(), chatHead, parent);
     }
 
 
     @Override
     public void detachView(ChatHead<T> chatHead, ViewGroup parent) {
-        viewAdapter.detachView(chatHead.getKey(), chatHead, parent);
+        if(chatHeads.size()>0)
+            viewAdapter.detachView(chatHead.getKey(), chatHead, parent);
     }
 
 
@@ -495,11 +507,11 @@ public class DefaultChatHeadManager<T extends Serializable> implements ChatHeadC
     public void setConfig(ChatHeadConfig config) {
         this.config = config;
         if (closeButton != null) {
-//            LayoutParams params = (LayoutParams) closeButton.getLayoutParams();
-//            params.width = config.getCloseButtonWidth();
-//            params.height = config.getCloseButtonHeight();
-//            params.bottomMargin = config.getCloseButtonBottomMargin();
-//            closeButton.setLayoutParams(params);
+            //            LayoutParams params = (LayoutParams) closeButton.getLayoutParams();
+            //            params.width = config.getCloseButtonWidth();
+            //            params.height = config.getCloseButtonHeight();
+            //            params.bottomMargin = config.getCloseButtonBottomMargin();
+            //            closeButton.setLayoutParams(params);
             if (config.isCloseButtonHidden()) {
                 closeButton.setVisibility(View.GONE);
                 closeButtonShadow.setVisibility(View.GONE);
