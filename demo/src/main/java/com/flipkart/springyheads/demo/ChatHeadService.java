@@ -205,9 +205,9 @@ public class ChatHeadService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         windowManagerContainer.destroy();
         chatHeadManager = null;
+        super.onDestroy();
     }
 
     public void minimize() {

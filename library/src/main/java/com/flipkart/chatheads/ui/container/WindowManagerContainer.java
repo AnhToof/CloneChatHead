@@ -37,6 +37,8 @@ public class WindowManagerContainer extends FrameChatHeadContainer {
      * beneath it only if they are outside the bounds.
      * {@link android.view.WindowManager.LayoutParams#FLAG_NOT_TOUCH_MODAL}
      */
+
+    private Context mContext;
     private View motionCaptureView;
 
     private int cachedHeight;
@@ -46,6 +48,18 @@ public class WindowManagerContainer extends FrameChatHeadContainer {
     private boolean motionCaptureViewAdded;
 
     private static final int OVERLAY_TYPE;
+
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            HostFrameLayout frameLayout = getFrameLayout();
+            if (frameLayout != null) {
+                frameLayout.minimize();
+            }
+        }
+    };
+
+    private IntentFilter mIntentFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
 
     static {
         if (Build.VERSION.SDK_INT >= 26) {
@@ -57,6 +71,7 @@ public class WindowManagerContainer extends FrameChatHeadContainer {
 
     public WindowManagerContainer(Context context) {
         super(context);
+        mContext = context;
     }
 
     @Override
@@ -70,15 +85,11 @@ public class WindowManagerContainer extends FrameChatHeadContainer {
     }
 
     public void registerReceiver(Context context) {
-        context.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                HostFrameLayout frameLayout = getFrameLayout();
-                if (frameLayout != null) {
-                    frameLayout.minimize();
-                }
-            }
-        }, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+        context.registerReceiver(mBroadcastReceiver, mIntentFilter);
+    }
+
+    public void unregisterReceiver(Context context) {
+        context.unregisterReceiver(mBroadcastReceiver);
     }
 
     public WindowManager getWindowManager() {
@@ -257,6 +268,7 @@ public class WindowManagerContainer extends FrameChatHeadContainer {
             windowManager.removeViewImmediate(motionCaptureView);
         }
         windowManager.removeViewImmediate(getFrameLayout());
+        mContext.unregisterReceiver(mBroadcastReceiver);
     }
 
     protected class MotionCapturingTouchListener implements View.OnTouchListener {
