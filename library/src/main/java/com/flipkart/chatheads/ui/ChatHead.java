@@ -7,18 +7,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
 import android.widget.ImageView;
-
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringListener;
 import com.facebook.rebound.SpringSystem;
 import com.flipkart.chatheads.ChatHeadUtils;
-
 import java.io.Serializable;
 
 /**
@@ -294,14 +291,8 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
                 int yVelocity = (int) velocityTracker.getYVelocity();
                 velocityTracker.recycle();
                 velocityTracker = null;
-                if(xPositionSpring!=null && yPositionSpring!=null) {
-                    ChatHeadArrangement chatHeadArrangement = manager.getActiveArrangement();
-                    if(chatHeadArrangement instanceof MaximizedArrangement){
-                        if(manager.getChatHeads().size()<2){
-                            manager.setArrangement(MinimizedArrangement.class, null);
-                        }
-                    }
-                    boolean touchUpHandled = manager.getActiveArrangement().handleTouchUp(this, xVelocity, yVelocity, activeHorizontalSpring, activeVerticalSpring, wasDragging);
+                if (xPositionSpring != null && yPositionSpring != null) {
+                    manager.getActiveArrangement().handleTouchUp(this, xVelocity, yVelocity, activeHorizontalSpring, activeVerticalSpring, wasDragging);
                 }
             }
         }

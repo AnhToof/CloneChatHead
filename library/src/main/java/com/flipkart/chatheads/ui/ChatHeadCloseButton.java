@@ -15,7 +15,8 @@ import com.flipkart.chatheads.R;
 public class ChatHeadCloseButton extends android.support.v7.widget.AppCompatImageView {
 
     private static final float PERC_PARENT_WIDTH = 0.1f; //perc of parent to be covered during drag
-    private static final float PERC_PARENT_HEIGHT = 0.05f; //perc of parent to be covered during drag
+    private static final float PERC_PARENT_HEIGHT = 0.05f;
+    //perc of parent to be covered during drag
     private int mParentWidth;
     private int mParentHeight;
     private Spring scaleSpring;
@@ -27,7 +28,8 @@ public class ChatHeadCloseButton extends android.support.v7.widget.AppCompatImag
     private int centerX;
     private int centerY;
 
-    public ChatHeadCloseButton(Context context, ChatHeadManager manager, int maxHeight, int maxWidth) {
+    public ChatHeadCloseButton(Context context, ChatHeadManager manager, int maxHeight,
+            int maxWidth) {
         super(context);
         init(manager, maxHeight, maxWidth);
     }
@@ -95,7 +97,6 @@ public class ChatHeadCloseButton extends android.support.v7.widget.AppCompatImag
                 }
             }
             disappeared = false;
-
         }
     }
 
@@ -108,25 +109,24 @@ public class ChatHeadCloseButton extends android.support.v7.widget.AppCompatImag
     }
 
     public void disappear(boolean immediate, boolean animate) {
-        if (immediate) {
-            ySpring.setEndValue(mParentHeight - centerY + chatHeadManager.getConfig().getCloseButtonHeight());
-            ySpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
-            xSpring.setEndValue(0);
-            ySpring.addListener(new SimpleSpringListener() {
-                @Override
-                public void onSpringAtRest(Spring spring) {
-                    super.onSpringAtRest(spring);
-                    ySpring.removeListener(this);
-                }
-            });
-            scaleSpring.setEndValue(0.1f);
-            if (!animate) {
-                ySpring.setCurrentValue(mParentHeight, true);
-                xSpring.setCurrentValue(0, true);
+        ySpring.setEndValue(
+                mParentHeight - centerY + chatHeadManager.getConfig().getCloseButtonHeight());
+        ySpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
+        xSpring.setEndValue(0);
+        ySpring.addListener(new SimpleSpringListener() {
+            @Override
+            public void onSpringAtRest(Spring spring) {
+                super.onSpringAtRest(spring);
+                ySpring.removeListener(this);
             }
-            disappeared = true;
-            if (listener != null) listener.onCloseButtonDisappear();
+        });
+        scaleSpring.setEndValue(0.1f);
+        if (!animate) {
+            ySpring.setCurrentValue(mParentHeight, true);
+            xSpring.setCurrentValue(0, true);
         }
+        disappeared = true;
+        if (listener != null) listener.onCloseButtonDisappear();
     }
 
     @Override
@@ -145,11 +145,11 @@ public class ChatHeadCloseButton extends android.support.v7.widget.AppCompatImag
         if (x != centerX || y != centerY) {
             changed = true;
         }
-        if(changed) {
+        if (changed) {
             this.centerX = x;
             this.centerY = y;
-            xSpring.setCurrentValue(0,false);
-            ySpring.setCurrentValue(0,false);
+            xSpring.setCurrentValue(0, false);
+            ySpring.setCurrentValue(0, false);
         }
     }
 
@@ -167,7 +167,8 @@ public class ChatHeadCloseButton extends android.support.v7.widget.AppCompatImag
 
     private double getTranslationFromSpring(double springValue, float percent, int fullValue) {
         float widthToCover = percent * fullValue;
-        return SpringUtil.mapValueFromRangeToRange(springValue, 0, fullValue, -widthToCover / 2, widthToCover / 2);
+        return SpringUtil.mapValueFromRangeToRange(springValue, 0, fullValue, -widthToCover / 2,
+                widthToCover / 2);
     }
 
     public boolean isAtRest() {

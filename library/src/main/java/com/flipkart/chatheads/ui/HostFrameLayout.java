@@ -34,11 +34,15 @@ public class HostFrameLayout extends FrameLayout {
         boolean handled = super.dispatchKeyEvent(event);
         if(!handled) {
             if (event.getAction() == KeyEvent.ACTION_UP && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-                minimize();
+                backPress();
                 return true;
             }
         }
         return handled;
+    }
+
+    protected void backPress() {
+        //Hook
     }
 
     public void minimize() {

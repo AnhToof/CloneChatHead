@@ -1,8 +1,6 @@
 package com.flipkart.springyheads.demo;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -10,14 +8,15 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import com.flipkart.chatheads.ui.ChatHead;
 import com.flipkart.chatheads.ui.ChatHeadArrangement;
 import com.flipkart.chatheads.ui.ChatHeadConfig;
@@ -45,12 +44,14 @@ public class ChatHeadService extends Service {
     private int chatHeadIdentifier = 0;
     private WindowManagerContainer windowManagerContainer;
     private Map<String, View> viewCache = new HashMap<>();
+    private boolean isChatHeadOpen = false;
+    private boolean isKeyboardOpen = false;
+    private View mView;
 
 
     public static Intent showFloating(Context context) {
         return new Intent(context, ChatHeadService.class);
     }
-
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -67,24 +68,58 @@ public class ChatHeadService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        windowManagerContainer = new WindowManagerContainer(this);
-        chatHeadManager = new DefaultChatHeadManager<String>(this, windowManagerContainer) {
+        windowManagerContainer = new WindowManagerContainer(this) {
             @Override
-            public void setConfig(ChatHeadConfig config) {
-                super.setConfig(new CustomChatHeadConfig(ChatHeadService.this, 56, 56));
+            protected void onBackPressed() {
+                super.onBackPressed();
+                if (isKeyboardOpen) {
+                    if (mView != null) {
+                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(mView.getWindowToken(), 0);
+                        isKeyboardOpen = false;
+                    }
+                }
+                if (isChatHeadOpen && !isKeyboardOpen) {
+                    minimize();
+                    isChatHeadOpen = false;
+                }
             }
         };
+
+        chatHeadManager = new DefaultChatHeadManager<String>(this, windowManagerContainer);
+        chatHeadManager.setConfig(new CustomChatHeadConfig(getApplicationContext(), 0, 300));
         chatHeadManager.setViewAdapter(new ChatHeadViewAdapter<String>() {
 
             @Override
-            public View attachView(String key, ChatHead chatHead, ViewGroup parent) {
+            public View attachView(String key, final ChatHead chatHead, ViewGroup parent) {
                 View cachedView = viewCache.get(key);
                 if (cachedView == null) {
-                    LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                    View view = inflater.inflate(R.layout.fragment_test, parent, false);
-                    TextView identifier = (TextView) view.findViewById(R.id.identifier);
-                    identifier.setText(key);
+                    LayoutInflater inflater =
+                            (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                    final View view = inflater.inflate(R.layout.fragment_test, parent, false);
+                    mView = view;
+                    LinearLayout linearLayout = view.findViewById(R.id.linearLayout);
+                    final EditText editText = view.findViewById(R.id.identifier);
                     cachedView = view;
+                    view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+                            if (chatHeadManager.getActiveArrangement() instanceof MinimizedArrangement) {
+                                isChatHeadOpen = false;
+                                isKeyboardOpen = false;
+                            } else  {
+                                isChatHeadOpen = true;
+                            }
+                            if (isChatHeadOpen) {
+                                if (editText.isFocused()) {
+                                    int heightDiff = view.getRootView().getHeight() - view.getHeight();
+                                    if (heightDiff > 100) {
+                                        isKeyboardOpen = true;
+                                    }
+                                }
+                            }
+                        }
+                    });
                     viewCache.put(key, view);
                 }
                 parent.addView(cachedView);
@@ -92,17 +127,19 @@ public class ChatHeadService extends Service {
             }
 
             @Override
-            public void detachView(String key, ChatHead<? extends Serializable> chatHead, ViewGroup parent) {
+            public void detachView(String key, ChatHead<? extends Serializable> chatHead,
+                    ViewGroup parent) {
                 View cachedView = viewCache.get(key);
-                if(cachedView!=null) {
+                if (cachedView != null) {
                     parent.removeView(cachedView);
                 }
             }
 
             @Override
-            public void removeView(String key, ChatHead<? extends Serializable> chatHead, ViewGroup parent) {
+            public void removeView(String key, ChatHead<? extends Serializable> chatHead,
+                    ViewGroup parent) {
                 View cachedView = viewCache.get(key);
-                if(cachedView!=null) {
+                if (cachedView != null) {
                     viewCache.remove(key);
                     parent.removeView(cachedView);
                 }
@@ -148,31 +185,33 @@ public class ChatHeadService extends Service {
         addChatHead();
         chatHeadManager.setArrangement(MinimizedArrangement.class, null);
         moveToForeground();
-
     }
 
     private Drawable getChatHeadDrawable(String key) {
         Random rnd = new Random();
         int randomColor = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
         CircularDrawable circularDrawable = new CircularDrawable();
-        circularDrawable.setBitmapOrTextOrIcon(new TextDrawer().setText("C" + key).setBackgroundColor(randomColor));
+        circularDrawable.setBitmapOrTextOrIcon(
+                new TextDrawer().setText("C" + key).setBackgroundColor(randomColor));
         int badgeCount = (int) (Math.random() * 10f);
-        circularDrawable.setNotificationDrawer(new CircularNotificationDrawer().setNotificationText(String.valueOf(badgeCount)).setNotificationAngle(135).setNotificationColor(Color.WHITE, Color.RED));
+        circularDrawable.setNotificationDrawer(
+                new CircularNotificationDrawer().setNotificationText(String.valueOf(badgeCount))
+                        .setNotificationAngle(135)
+                        .setNotificationColor(Color.WHITE, Color.RED));
         circularDrawable.setBorder(Color.WHITE, 3);
         return circularDrawable;
-
     }
 
     private void moveToForeground() {
-        Notification notification = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Springy heads")
-                .setContentText("Click to configure.")
-                .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, FloatingActivity.class), 0))
-                .build();
+        Notification notification =
+                new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Springy heads")
+                        .setContentText("Click to configure.")
+                        .setContentIntent(PendingIntent.getActivity(this, 0,
+                                new Intent(this, FloatingActivity.class), 0))
+                        .build();
 
         startForeground(1, notification);
-
     }
 
     public void addChatHead() {
@@ -211,7 +250,7 @@ public class ChatHeadService extends Service {
     }
 
     public void minimize() {
-        chatHeadManager.setArrangement(MinimizedArrangement.class,null);
+        chatHeadManager.setArrangement(MinimizedArrangement.class, null);
     }
 
     /**

@@ -476,7 +476,6 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
                 activeVerticalSpring.setSpringConfig(SpringConfigsHolder.CAPTURING);
                 activeHorizontalSpring.setEndValue(coords[0]);
                 activeVerticalSpring.setEndValue(coords[1]);
-
             }
             if (activeChatHead.getState() == ChatHead.State.CAPTURED && activeVerticalSpring.isAtRest()) {
                 manager.getCloseButton().disappear(false, true);

@@ -30,7 +30,13 @@ public abstract class FrameChatHeadContainer implements ChatHeadContainer {
     @Override
     public void onInitialized(ChatHeadManager manager) {
         this.manager = manager;
-        HostFrameLayout frameLayout = new HostFrameLayout(context, this, manager);
+        HostFrameLayout frameLayout = new HostFrameLayout(context, this, manager) {
+            @Override
+            protected void backPress() {
+                onBackPressed();
+            }
+        };
+
         frameLayout.setFocusable(true);
         frameLayout.setFocusableInTouchMode(true);
         this.frameLayout = frameLayout;
@@ -72,6 +78,10 @@ public abstract class FrameChatHeadContainer implements ChatHeadContainer {
         layoutParams.gravity = gravity;
         layoutParams.bottomMargin = bottomMargin;
         return layoutParams;
+    }
+
+    protected void onBackPressed() {
+        //Override this method to implementation back event
     }
 
     @Override

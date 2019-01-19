@@ -1,19 +1,25 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/rounded_white"
     android:orientation="vertical"
+    android:id="@+id/linearLayout"
     android:focusable="true"
     android:clickable="true">
 
-    <EditText
-        android:id="@+id/identifier"
-        android:text="id"
-        android:textColor="@android:color/background_dark"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
+        android:layout_height="match_parent"
+        >
+        <EditText
+            android:id="@+id/identifier"
+            android:text="id"
+            android:textColor="@android:color/background_dark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"/>
 
+    </RelativeLayout>
 
-</RelativeLayout>
+</LinearLayout>
