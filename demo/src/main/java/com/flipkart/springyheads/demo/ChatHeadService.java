@@ -215,8 +215,8 @@ public class ChatHeadService extends Service {
 
     public void addChatHead() {
         chatHeadIdentifier++;
-        chatHeadManager.addChatHead(String.valueOf(1), false, true);
-        chatHeadManager.bringToFront(chatHeadManager.findChatHeadByKey(String.valueOf(1)));
+        /*chatHeadManager.addChatHead(String.valueOf(1), false, true);
+        chatHeadManager.bringToFront(chatHeadManager.findChatHeadByKey(String.valueOf(1)));*/
     }
 
     public void removeChatHead() {
