@@ -255,7 +255,9 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (Math.hypot(offsetX, offsetY) > touchSlop) {
                 isDragging = true;
-                mOnItemDraggingListener.onItemDragging(isDragging);
+                if (mOnItemDraggingListener != null) {
+                    mOnItemDraggingListener.onItemDragging(isDragging);
+                }
                 if (showCloseButton) {
                     manager.getCloseButton().appear();
                 }
@@ -293,7 +295,9 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
                 activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.DRAGGING);
                 activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.DRAGGING);
                 isDragging = false;
-                mOnItemDraggingListener.onItemDragging(isDragging);
+                if (mOnItemDraggingListener != null) {
+                    mOnItemDraggingListener.onItemDragging(isDragging);
+                }
                 scaleSpring.setEndValue(1);
                 int xVelocity = (int) velocityTracker.getXVelocity();
                 int yVelocity = (int) velocityTracker.getYVelocity();
