@@ -47,7 +47,6 @@ public class ChatHeadService extends Service {
     private boolean isKeyboardOpen = false;
     private View mView;
 
-
     public static Intent showFloating(Context context) {
         return new Intent(context, ChatHeadService.class);
     }
@@ -73,7 +72,8 @@ public class ChatHeadService extends Service {
                 super.onBackPressed();
                 if (isKeyboardOpen) {
                     if (mView != null) {
-                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        InputMethodManager imm =
+                                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(mView.getWindowToken(), 0);
                         isKeyboardOpen = false;
                     }
@@ -100,25 +100,28 @@ public class ChatHeadService extends Service {
                     LinearLayout linearLayout = view.findViewById(R.id.linearLayout);
                     final EditText editText = view.findViewById(R.id.identifier);
                     cachedView = view;
-                    view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                        @Override
-                        public void onGlobalLayout() {
-                            if (chatHeadManager.getActiveArrangement() instanceof MinimizedArrangement) {
-                                isChatHeadOpen = false;
-                                isKeyboardOpen = false;
-                            } else  {
-                                isChatHeadOpen = true;
-                            }
-                            if (isChatHeadOpen) {
-                                if (editText.isFocused()) {
-                                    int heightDiff = view.getRootView().getHeight() - view.getHeight();
-                                    if (heightDiff > 100) {
-                                        isKeyboardOpen = true;
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    view.getViewTreeObserver()
+                            .addOnGlobalLayoutListener(
+                                    new ViewTreeObserver.OnGlobalLayoutListener() {
+                                        @Override
+                                        public void onGlobalLayout() {
+                                            if (chatHeadManager.getActiveArrangement() instanceof MinimizedArrangement) {
+                                                isChatHeadOpen = false;
+                                                isKeyboardOpen = false;
+                                            } else {
+                                                isChatHeadOpen = true;
+                                            }
+                                            if (isChatHeadOpen) {
+                                                if (editText.isFocused()) {
+                                                    int heightDiff = view.getRootView().getHeight()
+                                                            - view.getHeight();
+                                                    if (heightDiff > 100) {
+                                                        isKeyboardOpen = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
                     viewCache.put(key, view);
                 }
                 parent.addView(cachedView);
@@ -192,7 +195,7 @@ public class ChatHeadService extends Service {
         CircularDrawable circularDrawable = new CircularDrawable();
         circularDrawable.setBitmapOrTextOrIcon(
                 new TextDrawer().setText("C" + key).setBackgroundColor(randomColor));
-        int badgeCount = (int) (Math.random() * 10f);
+        int badgeCount = 1;
         circularDrawable.setNotificationDrawer(
                 new CircularNotificationDrawer().setNotificationText(String.valueOf(badgeCount))
                         .setNotificationAngle(135)
@@ -215,8 +218,8 @@ public class ChatHeadService extends Service {
 
     public void addChatHead() {
         chatHeadIdentifier++;
-        /*chatHeadManager.addChatHead(String.valueOf(1), false, true);
-        chatHeadManager.bringToFront(chatHeadManager.findChatHeadByKey(String.valueOf(1)));*/
+        chatHeadManager.addChatHead(String.valueOf(1), false, true);
+        chatHeadManager.bringToFront(chatHeadManager.findChatHeadByKey(String.valueOf(1)));
     }
 
     public void removeChatHead() {
