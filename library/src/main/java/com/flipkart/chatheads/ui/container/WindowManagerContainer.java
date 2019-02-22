@@ -108,10 +108,11 @@ public class WindowManagerContainer extends FrameChatHeadContainer {
     }
 
     protected void setContainerWidth(View container, int width) {
-
-        WindowManager.LayoutParams layoutParams = getOrCreateLayoutParamsForContainer(container);
-        layoutParams.width = width;
-        getWindowManager().updateViewLayout(container, layoutParams);
+        if (motionCaptureView.getWindowToken() != null) {
+            WindowManager.LayoutParams layoutParams = getOrCreateLayoutParamsForContainer(container);
+            layoutParams.width = width;
+            getWindowManager().updateViewLayout(container, layoutParams);
+        }
     }
 
     protected WindowManager.LayoutParams getOrCreateLayoutParamsForContainer(View container) {
