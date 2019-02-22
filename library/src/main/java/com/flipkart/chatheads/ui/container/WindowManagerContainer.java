@@ -100,12 +100,15 @@ public class WindowManagerContainer extends FrameChatHeadContainer {
     }
 
     protected void setContainerHeight(View container, int height) {
-        WindowManager.LayoutParams layoutParams = getOrCreateLayoutParamsForContainer(container);
-        layoutParams.height = height;
-        getWindowManager().updateViewLayout(container, layoutParams);
+        if (motionCaptureView.getWindowToken() != null) {
+            WindowManager.LayoutParams layoutParams = getOrCreateLayoutParamsForContainer(container);
+            layoutParams.height = height;
+            getWindowManager().updateViewLayout(container, layoutParams);
+        }
     }
 
     protected void setContainerWidth(View container, int width) {
+
         WindowManager.LayoutParams layoutParams = getOrCreateLayoutParamsForContainer(container);
         layoutParams.width = width;
         getWindowManager().updateViewLayout(container, layoutParams);
@@ -122,9 +125,11 @@ public class WindowManagerContainer extends FrameChatHeadContainer {
     }
 
     protected void setContainerX(View container, int xPosition) {
-        WindowManager.LayoutParams layoutParams = getOrCreateLayoutParamsForContainer(container);
-        layoutParams.x = xPosition;
-        getWindowManager().updateViewLayout(container, layoutParams);
+        if (motionCaptureView.getWindowToken() != null) {
+            WindowManager.LayoutParams layoutParams = getOrCreateLayoutParamsForContainer(container);
+            layoutParams.x = xPosition;
+            getWindowManager().updateViewLayout(container, layoutParams);
+        }
     }
 
     protected int getContainerX(View container) {
@@ -133,9 +138,11 @@ public class WindowManagerContainer extends FrameChatHeadContainer {
     }
 
     protected void setContainerY(View container, int yPosition) {
-        WindowManager.LayoutParams layoutParams = getOrCreateLayoutParamsForContainer(container);
-        layoutParams.y = yPosition;
-        getWindowManager().updateViewLayout(container, layoutParams);
+        if (motionCaptureView.getWindowToken() != null) {
+            WindowManager.LayoutParams layoutParams = getOrCreateLayoutParamsForContainer(container);
+            layoutParams.y = yPosition;
+            getWindowManager().updateViewLayout(container, layoutParams);
+        }
     }
 
     protected int getContainerY(View container) {

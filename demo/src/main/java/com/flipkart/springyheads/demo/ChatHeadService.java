@@ -223,8 +223,9 @@ public class ChatHeadService extends Service {
     }
 
     public void removeChatHead() {
-        chatHeadManager.removeChatHead(String.valueOf(chatHeadIdentifier), true);
-        chatHeadIdentifier--;
+        removeAllChatHeads();
+        stopSelf();
+        stopForeground(true);
     }
 
     public void removeAllChatHeads() {
