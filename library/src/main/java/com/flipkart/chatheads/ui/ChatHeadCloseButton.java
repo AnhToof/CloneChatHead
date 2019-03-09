@@ -88,7 +88,7 @@ public class ChatHeadCloseButton extends android.support.v7.widget.AppCompatImag
         if (isEnabled()) {
             ySpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
             xSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
-            scaleSpring.setEndValue(.8f);
+            scaleSpring.setEndValue(0.85f);
             ViewParent parent = getParent();
             if (parent instanceof ViewGroup) {
                 int i = ((ViewGroup) parent).indexOfChild(this);

@@ -22,7 +22,8 @@ import java.io.Serializable;
  * Created by kirankumar on 10/02/15.
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class ChatHead<T extends Serializable> extends android.support.v7.widget.AppCompatImageView implements SpringListener {
+public class ChatHead<T extends Serializable> extends android.support.v7.widget.AppCompatImageView
+        implements SpringListener {
 
     final int CLOSE_ATTRACTION_THRESHOLD = ChatHeadUtils.dpToPx(getContext(), 110);
 
@@ -49,6 +50,8 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
     private Bundle extras;
     private ImageView imageView;
     private boolean isHero;
+    private State previousState;
+    private long currentTimeMillis;
 
     public ChatHead(Context context) {
         super(context);
@@ -65,7 +68,8 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
         throw new IllegalArgumentException("This constructor cannot be used");
     }
 
-    public ChatHead(ChatHeadManager manager, SpringSystem springsHolder, Context context, boolean isSticky) {
+    public ChatHead(ChatHeadManager manager, SpringSystem springsHolder, Context context,
+            boolean isSticky) {
         super(context);
         this.manager = manager;
         this.springSystem = springsHolder;
@@ -106,7 +110,8 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
             @Override
             public void onSpringUpdate(Spring spring) {
                 super.onSpringUpdate(spring);
-                manager.getChatHeadContainer().setViewX(ChatHead.this, (int)spring.getCurrentValue());
+                manager.getChatHeadContainer()
+                        .setViewX(ChatHead.this, (int) spring.getCurrentValue());
             }
 
             @Override
@@ -122,7 +127,8 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
             @Override
             public void onSpringUpdate(Spring spring) {
                 super.onSpringUpdate(spring);
-                manager.getChatHeadContainer().setViewY(ChatHead.this, (int)spring.getCurrentValue());
+                manager.getChatHeadContainer()
+                        .setViewY(ChatHead.this, (int) spring.getCurrentValue());
             }
 
             @Override
@@ -179,24 +185,26 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
         if (xPositionSpring != null && yPositionSpring != null) {
             Spring activeHorizontalSpring = xPositionSpring;
             Spring activeVerticalSpring = yPositionSpring;
-            if (spring != activeHorizontalSpring && spring != activeVerticalSpring)
-                return;
-            int totalVelocity = (int) Math.hypot(activeHorizontalSpring.getVelocity(), activeVerticalSpring.getVelocity());
-            if (manager.getActiveArrangement() != null)
-                manager.getActiveArrangement().onSpringUpdate(this, isDragging, manager.getMaxWidth(), manager.getMaxHeight(), spring, activeHorizontalSpring, activeVerticalSpring, totalVelocity);
+            if (spring != activeHorizontalSpring && spring != activeVerticalSpring) return;
+            int totalVelocity = (int) Math.hypot(activeHorizontalSpring.getVelocity(),
+                    activeVerticalSpring.getVelocity());
+            if (manager.getActiveArrangement() != null) {
+                manager.getActiveArrangement()
+                        .onSpringUpdate(this, isDragging, manager.getMaxWidth(),
+                                manager.getMaxHeight(), spring, activeHorizontalSpring,
+                                activeVerticalSpring, totalVelocity);
+            }
         }
     }
 
     @Override
     public void onSpringAtRest(Spring spring) {
-        if (manager.getListener() != null)
-            manager.getListener().onChatHeadAnimateEnd(this);
+        if (manager.getListener() != null) manager.getListener().onChatHeadAnimateEnd(this);
     }
 
     @Override
     public void onSpringActivate(Spring spring) {
-        if (manager.getListener() != null)
-            manager.getListener().onChatHeadAnimateStart(this);
+        if (manager.getListener() != null) manager.getListener().onChatHeadAnimateStart(this);
     }
 
     @Override
@@ -212,32 +220,33 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
         return yPositionListener;
     }
 
-    public void setOnItemChatHeadDraggingListener(OnItemChatHeadDraggingListener onItemDraggingListener) {
+    public void setOnItemChatHeadDraggingListener(
+            OnItemChatHeadDraggingListener onItemDraggingListener) {
         mOnItemDraggingListener = onItemDraggingListener;
     }
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         super.onTouchEvent(event);
-
-        if(xPositionSpring==null || yPositionSpring==null) return false;
+        if (xPositionSpring == null || yPositionSpring == null) return false;
         //Chathead view will set the correct active springs on touch
         Spring activeHorizontalSpring = xPositionSpring;
         Spring activeVerticalSpring = yPositionSpring;
 
         int action = event.getAction();
+
         float rawX = event.getRawX();
         float rawY = event.getRawY();
         float offsetX = rawX - downX;
         float offsetY = rawY - downY;
         boolean showCloseButton = manager.getActiveArrangement().shouldShowCloseButton(this);
-        event.offsetLocation(manager.getChatHeadContainer().getViewX(this), manager.getChatHeadContainer().getViewY(this));
+        event.offsetLocation(manager.getChatHeadContainer().getViewX(this),
+                manager.getChatHeadContainer().getViewY(this));
         if (action == MotionEvent.ACTION_DOWN) {
             if (velocityTracker == null) {
                 velocityTracker = VelocityTracker.obtain();
             } else {
                 velocityTracker.clear();
-
             }
             activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
             activeVerticalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
@@ -250,9 +259,8 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
             activeHorizontalSpring.setAtRest();
             activeVerticalSpring.setAtRest();
             velocityTracker.addMovement(event);
-
-
         } else if (action == MotionEvent.ACTION_MOVE) {
+            currentTimeMillis = System.currentTimeMillis();
             if (Math.hypot(offsetX, offsetY) > touchSlop) {
                 isDragging = true;
                 if (mOnItemDraggingListener != null) {
@@ -267,30 +275,34 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
             if (isDragging) {
                 manager.getCloseButton().pointTo(rawX, rawY);
                 if (manager.getActiveArrangement().canDrag(this)) {
-                    double distanceCloseButtonFromHead = manager.getDistanceCloseButtonFromHead(rawX, rawY);
-                    if (distanceCloseButtonFromHead < CLOSE_ATTRACTION_THRESHOLD && showCloseButton) {
+                    double distanceCloseButtonFromHead =
+                            manager.getDistanceCloseButtonFromHead(rawX, rawY);
+                    if (distanceCloseButtonFromHead < CLOSE_ATTRACTION_THRESHOLD
+                            && showCloseButton) {
                         setState(ChatHead.State.CAPTURED);
                         activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
                         activeVerticalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
                         int[] coords = manager.getChatHeadCoordsForCloseButton(this);
                         activeHorizontalSpring.setEndValue(coords[0]);
                         activeVerticalSpring.setEndValue(coords[1]);
+                        previousState = getState();
                         manager.getCloseButton().onCapture();
-
                     } else {
                         setState(ChatHead.State.FREE);
                         activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.DRAGGING);
                         activeVerticalSpring.setSpringConfig(SpringConfigsHolder.DRAGGING);
                         activeHorizontalSpring.setCurrentValue(downTranslationX + offsetX);
                         activeVerticalSpring.setCurrentValue(downTranslationY + offsetY);
-                        manager.getCloseButton().onRelease();
+                        previousState = getState();
+                        manager.getCloseButton().appear();
                     }
                     velocityTracker.computeCurrentVelocity(1000);
                 }
             }
-
         } else {
             if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                activeHorizontalSpring.setCurrentValue(downTranslationX + offsetX);
+                activeVerticalSpring.setCurrentValue(downTranslationY + offsetY);
                 boolean wasDragging = isDragging;
                 activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.DRAGGING);
                 activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.DRAGGING);
@@ -304,7 +316,15 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
                 velocityTracker.recycle();
                 velocityTracker = null;
                 if (xPositionSpring != null && yPositionSpring != null) {
-                    manager.getActiveArrangement().handleTouchUp(this, xVelocity, yVelocity, activeHorizontalSpring, activeVerticalSpring, wasDragging);
+                    manager.getActiveArrangement()
+                            .handleTouchUp(this, xVelocity, yVelocity, activeHorizontalSpring,
+                                    activeVerticalSpring, wasDragging);
+                    double distanceCloseButtonFromHead =
+                            manager.getDistanceCloseButtonFromHead(rawX, rawY);
+                    if (previousState == State.FREE
+                            && distanceCloseButtonFromHead > CLOSE_ATTRACTION_THRESHOLD) {
+                        manager.getCloseButton().disappear(true, true);
+                    }
                 }
             }
         }
@@ -330,7 +350,6 @@ public class ChatHead<T extends Serializable> extends android.support.v7.widget.
     public void setImageDrawable(Drawable chatHeadDrawable) {
         super.setImageDrawable(chatHeadDrawable);
     }
-
 
     public enum State {
         FREE, CAPTURED

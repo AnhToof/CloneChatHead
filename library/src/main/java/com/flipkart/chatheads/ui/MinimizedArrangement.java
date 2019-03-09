@@ -3,13 +3,11 @@ package com.flipkart.chatheads.ui;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringChain;
 import com.facebook.rebound.SpringListener;
 import com.flipkart.chatheads.ChatHeadUtils;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -37,9 +35,12 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
     private SpringListener horizontalHeroListener = new SimpleSpringListener() {
         @Override
         public void onSpringUpdate(Spring spring) {
-            currentDelta = (float) ((float) DELTA * (maxWidth / 2 - spring.getCurrentValue()) / (maxWidth / 2));
-            if (horizontalSpringChain != null)
+            currentDelta = (float) ((float) DELTA * (maxWidth / 2 - spring.getCurrentValue()) / (
+                    maxWidth
+                            / 2));
+            if (horizontalSpringChain != null) {
                 horizontalSpringChain.getControlSpring().setCurrentValue(spring.getCurrentValue());
+            }
         }
 
         @Override
@@ -53,8 +54,9 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
     private SpringListener verticalHeroListener = new SimpleSpringListener() {
         @Override
         public void onSpringUpdate(Spring spring) {
-            if (verticalSpringChain != null)
+            if (verticalSpringChain != null) {
                 verticalSpringChain.getControlSpring().setCurrentValue(spring.getCurrentValue());
+            }
         }
 
         @Override
@@ -90,7 +92,8 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
     }
 
     @Override
-    public void onActivate(ChatHeadManager container, Bundle extras, int maxWidth, int maxHeight, boolean animated) {
+    public void onActivate(ChatHeadManager container, Bundle extras, int maxWidth, int maxHeight,
+            boolean animated) {
         isTransitioning = true;
         if (horizontalSpringChain != null || verticalSpringChain != null) {
             onDeactivate(maxWidth, maxHeight);
@@ -124,10 +127,13 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
                         public void onSpringUpdate(Spring spring) {
                             int index = horizontalSpringChain.getAllSprings().indexOf(spring);
                             int diff = index - horizontalSpringChain.getAllSprings().size() + 1;
-                            chatHead.getHorizontalSpring().setCurrentValue(spring.getCurrentValue() + diff * currentDelta);
+                            chatHead.getHorizontalSpring()
+                                    .setCurrentValue(
+                                            spring.getCurrentValue() + diff * currentDelta);
                         }
                     });
-                    Spring currentSpring = horizontalSpringChain.getAllSprings().get(horizontalSpringChain.getAllSprings().size() - 1);
+                    Spring currentSpring = horizontalSpringChain.getAllSprings()
+                            .get(horizontalSpringChain.getAllSprings().size() - 1);
                     currentSpring.setCurrentValue(chatHead.getHorizontalSpring().getCurrentValue());
                     verticalSpringChain.addSpring(new SimpleSpringListener() {
                         @Override
@@ -135,7 +141,8 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
                             chatHead.getVerticalSpring().setCurrentValue(spring.getCurrentValue());
                         }
                     });
-                    currentSpring = verticalSpringChain.getAllSprings().get(verticalSpringChain.getAllSprings().size() - 1);
+                    currentSpring = verticalSpringChain.getAllSprings()
+                            .get(verticalSpringChain.getAllSprings().size() - 1);
                     currentSpring.setCurrentValue(chatHead.getVerticalSpring().getCurrentValue());
                     manager.getChatHeadContainer().bringToFront(chatHead);
                     zIndex++;
@@ -155,14 +162,17 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
             } else {
                 idleStateY = (int) (relativeYPosition * maxHeight);
             }
-            if((relativeXPosition == 0 && relativeYPosition == 0) || roundedX.equals("000") && roundedY.equals("000")){
+            if ((relativeXPosition == 0 && relativeYPosition == 0)
+                    || roundedX.equals("000") && roundedY.equals("000")) {
                 idleStateX = container.getConfig().getInitialPosition().x;
                 idleStateY = container.getConfig().getInitialPosition().y;
             }
 
             idleStateX = stickToEdgeX(idleStateX, maxWidth, hero);
 
-            if (hero != null && hero.getHorizontalSpring() != null && hero.getVerticalSpring() != null) {
+            if (hero != null
+                    && hero.getHorizontalSpring() != null
+                    && hero.getVerticalSpring() != null) {
                 manager.getChatHeadContainer().bringToFront(hero);
                 horizontalSpringChain.addSpring(new SimpleSpringListener() {
                 });
@@ -196,17 +206,17 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
                 } else {
                     hero.getVerticalSpring().setCurrentValue(idleStateY, true);
                 }
-
             }
-
 
             this.maxWidth = maxWidth;
             this.maxHeight = maxHeight;
             container.getCloseButton().setEnabled(true);
         }
         hasActivated = true;
-        //        if(springsHolder.getActiveHorizontalSpring()!=null && springsHolder.getActiveVerticalSpring()!=null) {
-        //            handleTouchUp(null, 0, 0, springsHolder.getActiveHorizontalSpring(), springsHolder.getActiveVerticalSpring(), true);
+        //        if(springsHolder.getActiveHorizontalSpring()!=null && springsHolder
+        // .getActiveVerticalSpring()!=null) {
+        //            handleTouchUp(null, 0, 0, springsHolder.getActiveHorizontalSpring(),
+        // springsHolder.getActiveVerticalSpring(), true);
         //        }
     }
 
@@ -221,9 +231,13 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
 
     @Override
     public void onChatHeadAdded(ChatHead chatHead, boolean animated) {
-        if (hero != null && hero.getHorizontalSpring() != null && hero.getVerticalSpring() != null) {
-            chatHead.getHorizontalSpring().setCurrentValue(hero.getHorizontalSpring().getCurrentValue() - currentDelta);
-            chatHead.getVerticalSpring().setCurrentValue(hero.getVerticalSpring().getCurrentValue());
+        if (hero != null
+                && hero.getHorizontalSpring() != null
+                && hero.getVerticalSpring() != null) {
+            chatHead.getHorizontalSpring()
+                    .setCurrentValue(hero.getHorizontalSpring().getCurrentValue() - currentDelta);
+            chatHead.getVerticalSpring()
+                    .setCurrentValue(hero.getVerticalSpring().getCurrentValue());
         }
 
         onActivate(manager, getRetainBundle(), maxWidth, maxHeight, animated);
@@ -231,7 +245,7 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
 
     @Override
     public void onChatHeadRemoved(ChatHead removed) {
-        manager.detachView(removed,manager.getArrowLayout());
+        manager.detachView(removed, manager.getArrowLayout());
         manager.removeView(removed, manager.getArrowLayout());
         if (removed == hero) {
             hero = null;
@@ -276,8 +290,8 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
     }
 
     @Override
-    public boolean handleTouchUp(ChatHead activeChatHead, int xVelocity, int yVelocity, Spring
-            activeHorizontalSpring, Spring activeVerticalSpring, boolean wasDragging) {
+    public boolean handleTouchUp(ChatHead activeChatHead, int xVelocity, int yVelocity,
+            Spring activeHorizontalSpring, Spring activeVerticalSpring, boolean wasDragging) {
 
         settleToClosest(activeChatHead, xVelocity, yVelocity);
 
@@ -296,36 +310,37 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
         Spring activeVerticalSpring = activeChatHead.getVerticalSpring();
         if (activeChatHead.getState() == ChatHead.State.FREE) {
             if (Math.abs(xVelocity) < ChatHeadUtils.dpToPx(manager.getDisplayMetrics(), 50)) {
-                if (activeHorizontalSpring.getCurrentValue() < (maxWidth - activeHorizontalSpring.getCurrentValue())) {
+                if (activeHorizontalSpring.getCurrentValue() < (maxWidth
+                        - activeHorizontalSpring.getCurrentValue())) {
                     xVelocity = -1;
                 } else {
                     xVelocity = 1;
                 }
             }
             if (xVelocity < 0) {
-                int newVelocity = (int) (-activeHorizontalSpring.getCurrentValue() * SpringConfigsHolder.DRAGGING.friction);
-                if (xVelocity > newVelocity)
-                    xVelocity = (newVelocity);
-
+                int newVelocity = (int) (-activeHorizontalSpring.getCurrentValue()
+                        * SpringConfigsHolder.DRAGGING.friction);
+                if (xVelocity > newVelocity) xVelocity = (newVelocity);
             } else if (xVelocity > 0) {
-                int newVelocity = (int) ((maxWidth - activeHorizontalSpring.getCurrentValue() - manager.getConfig().getHeadWidth()) * SpringConfigsHolder.DRAGGING.friction);
-                if (newVelocity > xVelocity)
-                    xVelocity = (newVelocity);
+                int newVelocity = (int) ((maxWidth
+                        - activeHorizontalSpring.getCurrentValue()
+                        - manager.getConfig().getHeadWidth())
+                        * SpringConfigsHolder.DRAGGING.friction);
+                if (newVelocity > xVelocity) xVelocity = (newVelocity);
             }
-
-
         }
         if (Math.abs(xVelocity) <= 1) {
-            // this is a hack. If both velocities are 0, onSprintUpdate is not called and the chat head remains whereever it is
+            // this is a hack. If both velocities are 0, onSprintUpdate is not called and the
+            // chat head remains whereever it is
             // so we give a a negligible velocity to artificially fire onSpringUpdate
-            if (xVelocity < 0)
+            if (xVelocity < 0) {
                 xVelocity = -1;
-            else
+            } else {
                 xVelocity = 1;
+            }
         }
 
-        if (yVelocity == 0)
-            yVelocity = 1;
+        if (yVelocity == 0) yVelocity = 1;
 
         activeHorizontalSpring.setVelocity(xVelocity);
         activeVerticalSpring.setVelocity(yVelocity);
@@ -342,7 +357,7 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
     }
 
     private Bundle getBundle(int heroIndex) {
-        if(hero!=null && hero.getHorizontalSpring() != null) {
+        if (hero != null && hero.getHorizontalSpring() != null) {
             relativeXPosition = hero.getHorizontalSpring().getCurrentValue() * 1.0 / maxWidth;
             relativeYPosition = hero.getVerticalSpring().getCurrentValue() * 1.0 / maxHeight;
         }
@@ -404,20 +419,27 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
     }
 
     @Override
-    public void onSpringUpdate(ChatHead activeChatHead, boolean isDragging, int maxWidth, int maxHeight, Spring spring, Spring activeHorizontalSpring, Spring activeVerticalSpring, int totalVelocity) {
+    public void onSpringUpdate(ChatHead activeChatHead, boolean isDragging, int maxWidth,
+            int maxHeight, Spring spring, Spring activeHorizontalSpring,
+            Spring activeVerticalSpring, int totalVelocity) {
         /** This method does a bounds Check **/
         double xVelocity = activeHorizontalSpring.getVelocity();
         double yVelocity = activeVerticalSpring.getVelocity();
-        if (!isDragging && Math.abs(totalVelocity) < MIN_VELOCITY_TO_POSITION_BACK && activeChatHead == hero) {
+        if (!isDragging
+                && Math.abs(totalVelocity) < MIN_VELOCITY_TO_POSITION_BACK
+                && activeChatHead == hero) {
 
-            if (Math.abs(totalVelocity) < MAX_VELOCITY_FOR_IDLING && activeChatHead.getState() == ChatHead.State.FREE && hasActivated) {
+            if (Math.abs(totalVelocity) < MAX_VELOCITY_FOR_IDLING
+                    && activeChatHead.getState() == ChatHead.State.FREE
+                    && hasActivated) {
                 setIdleStateX((int) activeHorizontalSpring.getCurrentValue());
                 setIdleStateY((int) activeVerticalSpring.getCurrentValue());
             }
             if (spring == activeHorizontalSpring) {
 
                 double xPosition = activeHorizontalSpring.getCurrentValue();
-                if (xPosition + manager.getConfig().getHeadWidth() > maxWidth && activeHorizontalSpring.getVelocity() > 0) {
+                if (xPosition + manager.getConfig().getHeadWidth() > maxWidth
+                        && activeHorizontalSpring.getVelocity() > 0) {
                     //outside the right bound
                     //System.out.println("outside the right bound !! xPosition = " + xPosition);
                     int newPos = maxWidth - manager.getConfig().getHeadWidth();
@@ -428,20 +450,21 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
                     //System.out.println("outside the left bound !! xPosition = " + xPosition);
                     activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
                     activeHorizontalSpring.setEndValue(0);
-
                 } else {
                     //within bound
 
-
                 }
             } else if (spring == activeVerticalSpring) {
+
                 double yPosition = activeVerticalSpring.getCurrentValue();
-                if (yPosition + manager.getConfig().getHeadWidth() > maxHeight && activeVerticalSpring.getVelocity() > 0) {
+                if (yPosition + manager.getConfig().getHeadWidth() > maxHeight
+                        && activeVerticalSpring.getVelocity() > 0) {
                     //outside the bottom bound
                     //System.out.println("outside the bottom bound !! yPosition = " + yPosition);
 
                     activeVerticalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
-                    activeVerticalSpring.setEndValue(maxHeight - manager.getConfig().getHeadHeight());
+                    activeVerticalSpring.setEndValue(
+                            maxHeight - manager.getConfig().getHeadHeight());
                 } else if (yPosition < 0 && activeVerticalSpring.getVelocity() < 0) {
                     //outside the top bound
                     //System.out.println("outside the top bound !! yPosition = " + yPosition);
@@ -451,25 +474,28 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
                 } else {
                     //within bound
                 }
-
             }
         }
 
         if (!isDragging && activeChatHead == hero) {
 
             /** Capturing check **/
-
-
             int[] coords = manager.getChatHeadCoordsForCloseButton(activeChatHead);
-            double distanceCloseButtonFromHead = manager.getDistanceCloseButtonFromHead((float) activeHorizontalSpring.getCurrentValue() + manager.getConfig().getHeadWidth() / 2, (float) activeVerticalSpring.getCurrentValue() + manager.getConfig().getHeadHeight() / 2);
+            double distanceCloseButtonFromHead = manager.getDistanceCloseButtonFromHead(
+                    (float) activeHorizontalSpring.getCurrentValue()
+                            + manager.getConfig().getHeadWidth() / 2,
+                    (float) activeVerticalSpring.getCurrentValue()
+                            + manager.getConfig().getHeadHeight() / 2);
 
-            if (distanceCloseButtonFromHead < activeChatHead.CLOSE_ATTRACTION_THRESHOLD && activeHorizontalSpring.getSpringConfig() == SpringConfigsHolder.DRAGGING && activeVerticalSpring.getSpringConfig() == SpringConfigsHolder.DRAGGING) {
+            if (distanceCloseButtonFromHead < activeChatHead.CLOSE_ATTRACTION_THRESHOLD
+                    && activeHorizontalSpring.getSpringConfig() == SpringConfigsHolder.DRAGGING
+                    && activeVerticalSpring.getSpringConfig() == SpringConfigsHolder.DRAGGING) {
                 activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
                 activeVerticalSpring.setSpringConfig(SpringConfigsHolder.NOT_DRAGGING);
                 activeChatHead.setState(ChatHead.State.CAPTURED);
-
             }
-            if (activeChatHead.getState() == ChatHead.State.CAPTURED && activeHorizontalSpring.getSpringConfig() != SpringConfigsHolder.CAPTURING) {
+            if (activeChatHead.getState() == ChatHead.State.CAPTURED
+                    && activeHorizontalSpring.getSpringConfig() != SpringConfigsHolder.CAPTURING) {
                 activeHorizontalSpring.setAtRest();
                 activeVerticalSpring.setAtRest();
                 activeHorizontalSpring.setSpringConfig(SpringConfigsHolder.CAPTURING);
@@ -477,7 +503,8 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
                 activeHorizontalSpring.setEndValue(coords[0]);
                 activeVerticalSpring.setEndValue(coords[1]);
             }
-            if (activeChatHead.getState() == ChatHead.State.CAPTURED && activeVerticalSpring.isAtRest()) {
+            if (activeChatHead.getState() == ChatHead.State.CAPTURED
+                    && activeVerticalSpring.isAtRest()) {
                 manager.getCloseButton().disappear(false, true);
                 manager.captureChatHeads(activeChatHead);
             }
@@ -487,8 +514,6 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
                 manager.getCloseButton().disappear(true, true);
             }
         }
-
-
     }
 
     @Override
@@ -506,5 +531,4 @@ public class MinimizedArrangement<T extends Serializable> extends ChatHeadArrang
     public boolean shouldShowCloseButton(ChatHead chatHead) {
         return true;
     }
-
 }
